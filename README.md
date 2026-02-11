@@ -74,7 +74,7 @@ Senha: 3ST@G10N@L1N
 ### 1️⃣ Clonar o repositório
 
 ```bash
-git clone https://github.com/SEU-USUARIO/nalin-frontend.git
+git clone https://github.com/coder.marllon/nalin-frontend.git
 ```
 
 ### 2️⃣ Acessar a pasta
