@@ -1,5 +1,3 @@
-# nalin-frontend
-
 # 🚀 Desafio Nalin — Frontend (Vue.js)
 
 Este projeto foi desenvolvido como solução para o desafio técnico da **Nalin**.
