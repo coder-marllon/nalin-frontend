@@ -75,7 +75,8 @@ export default {
 /* Fundo azul degradê ocupando a tela toda */
 .login-page {
   height: 100vh;
-  background: linear-gradient(135deg, #4cafef, #3b6edc);
+  /* background: linear-gradient(135deg, #4cafef, #3b6edc); */
+  background: linear-gradient(135deg, #c21f2d, #7a0404);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -95,7 +96,8 @@ export default {
 /* Título Nalin */
 h1 {
   margin-bottom: 5px;
-  color: #3b6edc;
+  /* color: #3b6edc; */
+  color: rgb(224, 2, 2);
 }
 
 /* Subtítulo */
@@ -117,7 +119,8 @@ input {
 button {
   width: 100%;
   padding: 12px;
-  background: #4cafef;
+  /* background: #4cafef; */
+  background: red;
   color: white;
   border: none;
   border-radius: 8px;
@@ -127,7 +130,8 @@ button {
 
 /* Efeito hover do botão */
 button:hover {
-  background: #3498db;
+  /* background: #3498db; */
+  background: #8B0000;
 }
 
 /* Mensagem de erro */

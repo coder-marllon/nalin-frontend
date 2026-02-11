@@ -1,44 +1,63 @@
 <template>
-  <!-- Container da página -->
   <div class="page">
-
-    <!-- Card dos filtros -->
     <div class="card">
       <h1>Produtos</h1>
 
-      <!-- Área dos filtros -->
       <div class="filters">
-        <!-- v-model liga os inputs com variáveis do data() -->
         <input v-model="codigo" placeholder="Código" />
-        <input v-model="departamento" placeholder="Departamento" />
+
+        <!-- SELECT em vez de INPUT -->
+        <select v-model="departamento" class="select-departamento">
+          <option value="">Todos os departamentos</option>
+          <option v-for="dept in listaDepartamentos" :key="dept" :value="dept">
+            {{ dept }}
+          </option>
+        </select>
+
         <input v-model="descricao" placeholder="Descrição" />
-
-        <!-- Botão que chama a API novamente -->
         <button class="btn primary" @click="buscarProdutos">Buscar</button>
-
-        <!-- Botão sair -->
         <button class="btn danger" @click="logout">Sair</button>
       </div>
     </div>
 
-    <!-- Card da tabela -->
     <div class="card table-card">
       <table>
         <thead>
           <tr>
-            <th>Código</th>
-            <th>Descrição</th>
-            <th>Departamento</th>
+            <!-- Cabeçalho com ordenação para Código -->
+            <th @click="ordenarPor('codigo')" class="sortable-header">
+              Código
+              <span v-if="ordenacao.coluna === 'codigo'" class="sort-icon">
+                {{ ordenacao.direcao === 'asc' ? '↑' : '↓' }}
+              </span>
+              <span v-else class="sort-icon-placeholder">↕</span>
+            </th>
+
+            <!-- Cabeçalho com ordenação para Descrição -->
+            <th @click="ordenarPor('descricao')" class="sortable-header">
+              Descrição
+              <span v-if="ordenacao.coluna === 'descricao'" class="sort-icon">
+                {{ ordenacao.direcao === 'asc' ? '↑' : '↓' }}
+              </span>
+              <span v-else class="sort-icon-placeholder">↕</span>
+            </th>
+
+            <!-- Cabeçalho com ordenação para Departamento -->
+            <th @click="ordenarPor('departamento')" class="sortable-header">
+              Departamento
+              <span v-if="ordenacao.coluna === 'departamento'" class="sort-icon">
+                {{ ordenacao.direcao === 'asc' ? '↑' : '↓' }}
+              </span>
+              <span v-else class="sort-icon-placeholder">↕</span>
+            </th>
           </tr>
         </thead>
-
         <tbody>
-          <!-- Percorre a lista filtrada -->
-          <tr v-for="p in produtosFiltrados" :key="p.codigo">
+          <!-- Agora usa produtosOrdenadosFiltrados -->
+          <tr v-for="p in produtosOrdenadosFiltrados" :key="p.codigo">
             <td>{{ p.codigo }}</td>
             <td>{{ p.descricao }}</td>
             <td>
-              <!-- badge azul bonitinho -->
               <span class="badge">{{ p.departamento }}</span>
             </td>
           </tr>
@@ -49,72 +68,106 @@
 </template>
 
 <script>
-// axios configurado
 import api from "../services/api";
 
 export default {
-  // Variáveis reativas da tela
   data() {
     return {
-      produtos: [],     // lista que vem da API
-      codigo: "",       // filtro digitado pelo usuário
-      departamento: "", // filtro digitado pelo usuário
-      descricao: "",    // filtro digitado pelo usuário
+      produtos: [],
+      codigo: "",
+      departamento: "", // Agora bindado com o select
+      descricao: "",
+      listaDepartamentos: [], // Nova lista para o dropdown
+
+      // Controle de ordenação
+      ordenacao: {
+        coluna: 'codigo', // 'codigo', 'descricao', 'departamento'
+        direcao: 'asc'    // 'asc' (crescente) ou 'desc' (decrescente)
+      }
     };
   },
 
-  // Computed = recalcula automaticamente quando algo muda
   computed: {
     produtosFiltrados() {
       return this.produtos.filter((p) => {
-
-        // remove espaços extras e padroniza letras minúsculas
         const codigoFiltro = this.codigo.trim();
         const depFiltro = this.departamento.trim().toLowerCase();
         const descFiltro = this.descricao.trim().toLowerCase();
 
-        // Verifica se código contém o que foi digitado
         const filtroCodigo =
           !codigoFiltro || p.codigo.toString().includes(codigoFiltro);
 
-        // Verifica departamento
+        // Modificação: agora compara igualdade (select) em vez de "includes"
         const filtroDepartamento =
-          !depFiltro || p.departamento.toLowerCase().includes(depFiltro);
+          !depFiltro || p.departamento.toLowerCase() === depFiltro;
 
-        // Verifica descrição
         const filtroDescricao =
           !descFiltro || p.descricao.toLowerCase().includes(descFiltro);
 
-        // Só aparece na tabela se passar em TODOS filtros
         return filtroCodigo && filtroDepartamento && filtroDescricao;
       });
     },
+
+    // Nova computed property para produtos filtrados E ordenados
+    produtosOrdenadosFiltrados() {
+      // Pega os produtos já filtrados
+      const filtrados = this.produtosFiltrados;
+
+      // Ordena conforme configuração atual
+      return [...filtrados].sort((a, b) => {
+        let valorA, valorB;
+
+        // Obtém os valores baseado na coluna selecionada
+        switch (this.ordenacao.coluna) {
+          case 'codigo':
+            valorA = a.codigo;
+            valorB = b.codigo;
+            break;
+          case 'descricao':
+            valorA = a.descricao.toLowerCase();
+            valorB = b.descricao.toLowerCase();
+            break;
+          case 'departamento':
+            valorA = a.departamento.toLowerCase();
+            valorB = b.departamento.toLowerCase();
+            break;
+          default:
+            return 0;
+        }
+
+        // Comparação com base na direção
+        if (valorA < valorB) {
+          return this.ordenacao.direcao === 'asc' ? -1 : 1;
+        }
+        if (valorA > valorB) {
+          return this.ordenacao.direcao === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
   },
 
   methods: {
-    // Busca produtos na API
     async buscarProdutos() {
       try {
-        // pega token salvo no login
         const token = localStorage.getItem("token");
-
-        // chama endpoint protegido
         const res = await api.get("/produtos/listar", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // pega lista da resposta (usa ? para evitar erro se vier null)
         const lista = res.data?.data ?? [];
 
-        // trata e organiza dados recebidos
         this.produtos = lista
           .map((p) => ({
             codigo: Number(p.codigo),
             descricao: p.descricao || "Sem descrição",
             departamento: p.departamento || "Sem departamento",
-          }))
-          // ordena por código
-          .sort((a, b) => a.codigo - b.codigo);
+          }));
+          // Removido: .sort((a, b) => a.codigo - b.codigo);
+          // Agora a ordenação é feita pela computed property
+
+        // Extrai departamentos únicos
+        this.extrairDepartamentosUnicos();
 
       } catch (err) {
         console.error(err);
@@ -122,14 +175,32 @@ export default {
       }
     },
 
-    // Logout limpa token e volta para login
+    extrairDepartamentosUnicos() {
+      const todosDepartamentos = this.produtos
+        .map(p => p.departamento)
+        .filter(dept => dept && dept.trim() !== "");
+
+      this.listaDepartamentos = [...new Set(todosDepartamentos)].sort();
+    },
+
+    // Método para ordenar ao clicar nos cabeçalhos
+    ordenarPor(coluna) {
+      if (this.ordenacao.coluna === coluna) {
+        // Se clicar na mesma coluna, inverte a direção
+        this.ordenacao.direcao = this.ordenacao.direcao === 'asc' ? 'desc' : 'asc';
+      } else {
+        // Se clicar em coluna diferente, define como ascendente
+        this.ordenacao.coluna = coluna;
+        this.ordenacao.direcao = 'asc';
+      }
+    },
+
     logout() {
       localStorage.removeItem("token");
       this.$router.push("/");
     },
   },
 
-  // Executa automaticamente quando a tela abre
   mounted() {
     this.buscarProdutos();
   },
@@ -210,7 +281,7 @@ table {
 
 /* Cabeçalho azul */
 thead {
-  background: #4cafef;
+  background: #fa021b;
   color: white;
 }
 
@@ -232,9 +303,99 @@ tbody tr:hover {
 /* Badge azul do departamento */
 .badge {
   background: #eef4ff;
-  color: #3b6edc;
+  color: #e71b36;
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 12px;
+}
+
+.select-departamento {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: 200px; /* Ligeiramente maior que os inputs */
+  background-color: white;
+  cursor: pointer;
+}
+
+/* Estilo para os options */
+.select-departamento option {
+  padding: 8px;
+}
+
+/* Para manter o layout consistente */
+.filters input,
+.filters select {
+  height: 40px; /* mesma altura */
+  box-sizing: border-box;
+}
+
+/* Adicione hover e focus para o select */
+.select-departamento:hover {
+  border-color: #4cafef;
+}
+
+.select-departamento:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* ===== ESTILOS PARA ORDENAÇÃO ===== */
+
+/* Cabeçalhos clicáveis */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 30px !important; /* Espaço para o ícone */
+  transition: background-color 0.2s;
+}
+
+.sortable-header:hover {
+  background-color: rgba(250, 2, 27, 0.9) !important;
+}
+
+/* Ícones de ordenação */
+.sort-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+}
+
+.sort-icon-placeholder {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Para mobile */
+@media (max-width: 768px) {
+  .sort-icon,
+  .sort-icon-placeholder {
+    font-size: 10px;
+    right: 5px;
+  }
+
+  .sortable-header {
+    padding-right: 25px !important;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters input,
+  .filters select {
+    width: 100%;
+  }
 }
 </style>
