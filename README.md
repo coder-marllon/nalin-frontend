@@ -1,4 +1,4 @@
-# 🚀 Desafio Nalin — Frontend (Vue.js)
+# 🚀 Desafio — Frontend (Vue.js)
 
 Este projeto foi desenvolvido como solução para o desafio técnico da **Nalin**.
 
@@ -61,8 +61,8 @@ src/
 Utilize as credenciais fornecidas no desafio:
 
 ```
-Login: ESTAGIONALIN
-Senha: 3ST@G10N@L1N
+Login: ...
+Senha: ...
 ```
 
 ---
