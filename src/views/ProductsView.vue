@@ -6,7 +6,6 @@
       <div class="filters">
         <input v-model="codigo" placeholder="Código" />
 
-        <!-- SELECT em vez de INPUT -->
         <select v-model="departamento" class="select-departamento">
           <option value="">Todos os departamentos</option>
           <option v-for="dept in listaDepartamentos" :key="dept" :value="dept">
@@ -53,7 +52,7 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Agora usa produtosOrdenadosFiltrados -->
+          <!-- Usando produtosOrdenadosFiltrados -->
           <tr v-for="p in produtosOrdenadosFiltrados" :key="p.codigo">
             <td>{{ p.codigo }}</td>
             <td>{{ p.descricao }}</td>
@@ -77,7 +76,7 @@ export default {
       codigo: "",
       departamento: "", // Agora bindado com o select
       descricao: "",
-      listaDepartamentos: [], // Nova lista para o dropdown
+      listaDepartamentos: [], // Lista para o dropdown
 
       // Controle de ordenação
       ordenacao: {
@@ -97,7 +96,6 @@ export default {
         const filtroCodigo =
           !codigoFiltro || p.codigo.toString().includes(codigoFiltro);
 
-        // Modificação: agora compara igualdade (select) em vez de "includes"
         const filtroDepartamento =
           !depFiltro || p.departamento.toLowerCase() === depFiltro;
 
@@ -163,8 +161,6 @@ export default {
             descricao: p.descricao || "Sem descrição",
             departamento: p.departamento || "Sem departamento",
           }));
-          // Removido: .sort((a, b) => a.codigo - b.codigo);
-          // Agora a ordenação é feita pela computed property
 
         // Extrai departamentos únicos
         this.extrairDepartamentosUnicos();
@@ -330,7 +326,7 @@ tbody tr:hover {
   box-sizing: border-box;
 }
 
-/* Adicione hover e focus para o select */
+/* Adicionando hover e focus para o select */
 .select-departamento:hover {
   border-color: #4cafef;
 }
