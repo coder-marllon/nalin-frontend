@@ -1,8 +1,8 @@
 # nalin-frontend
 
-# 🚀 Desafio de Estágio Nalin — Frontend (Vue.js)
+# 🚀 Desafio Nalin — Frontend (Vue.js)
 
-Este projeto foi desenvolvido como solução para o desafio técnico de estágio da **Lojas Nalin**.
+Este projeto foi desenvolvido como solução para o desafio técnico da **Nalin**.
 
 A aplicação consiste em uma interface em **Vue 3** que realiza autenticação via API e apresenta uma tela de listagem de produtos com filtros.
 
@@ -123,6 +123,3 @@ Este projeto foi desenvolvido exclusivamente para fins de avaliação técnica.
 
 Desenvolvido por **Marllon Lima** 💙
 =======
-# desafio-nalin
-Desafio de Desenvolvimento - Estágio Nalin
->>>>>>> 6aaf9da (feat: Desafio em Frontend Vue)
