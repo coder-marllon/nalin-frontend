@@ -1,6 +1,6 @@
-# 🚀 Desafio Nalin — Frontend (Vue.js)
+# 🚀 Desafio — Frontend (Vue.js)
 
-Este projeto foi desenvolvido como solução para o desafio técnico da **Nalin**.
+Este projeto foi desenvolvido como solução para o desafio técnico.
 
 A aplicação consiste em uma interface em **Vue 3** que realiza autenticação via API e apresenta uma tela de listagem de produtos com filtros.
 
@@ -61,8 +61,8 @@ src/
 Utilize as credenciais fornecidas no desafio:
 
 ```
-Login: ESTAGIONALIN
-Senha: 3ST@G10N@L1N
+Login: ...
+Senha: ...
 ```
 
 ---
