@@ -1,8 +1,14 @@
 <template>
   <div class="page">
-    <div class="card">
-      <h1>Produtos</h1>
 
+    <!-- 🔴 HEADER SUPERIOR -->
+    <div class="header">
+      <h1 class="titulo">Produtos</h1>
+      <button class="btn danger" @click="logout">Sair</button>
+    </div>
+
+    <!-- 🔎 FILTROS -->
+    <div class="card filtros-card">
       <div class="filters">
         <input v-model="codigo" placeholder="Código" />
 
@@ -14,45 +20,40 @@
         </select>
 
         <input v-model="descricao" placeholder="Descrição" />
+
         <button class="btn primary" @click="buscarProdutos">Buscar</button>
-        <button class="btn danger" @click="logout">Sair</button>
       </div>
     </div>
 
-    <div class="card table-card">
+    <!-- 📋 TABELA -->
+    <div class="card table-card fade-up">
       <table>
         <thead>
           <tr>
-            <!-- Cabeçalho com ordenação para Código -->
             <th @click="ordenarPor('codigo')" class="sortable-header">
               Código
-              <span v-if="ordenacao.coluna === 'codigo'" class="sort-icon">
+              <span v-if="ordenacao.coluna === 'codigo'">
                 {{ ordenacao.direcao === 'asc' ? '↑' : '↓' }}
               </span>
-              <span v-else class="sort-icon-placeholder">↕</span>
             </th>
 
-            <!-- Cabeçalho com ordenação para Descrição -->
             <th @click="ordenarPor('descricao')" class="sortable-header">
               Descrição
-              <span v-if="ordenacao.coluna === 'descricao'" class="sort-icon">
+              <span v-if="ordenacao.coluna === 'descricao'">
                 {{ ordenacao.direcao === 'asc' ? '↑' : '↓' }}
               </span>
-              <span v-else class="sort-icon-placeholder">↕</span>
             </th>
 
-            <!-- Cabeçalho com ordenação para Departamento -->
             <th @click="ordenarPor('departamento')" class="sortable-header">
               Departamento
-              <span v-if="ordenacao.coluna === 'departamento'" class="sort-icon">
+              <span v-if="ordenacao.coluna === 'departamento'">
                 {{ ordenacao.direcao === 'asc' ? '↑' : '↓' }}
               </span>
-              <span v-else class="sort-icon-placeholder">↕</span>
             </th>
           </tr>
         </thead>
+
         <tbody>
-          <!-- Usando produtosOrdenadosFiltrados -->
           <tr v-for="p in produtosOrdenadosFiltrados" :key="p.codigo">
             <td>{{ p.codigo }}</td>
             <td>{{ p.descricao }}</td>
@@ -63,6 +64,7 @@
         </tbody>
       </table>
     </div>
+
   </div>
 </template>
 
@@ -74,15 +76,14 @@ export default {
     return {
       produtos: [],
       codigo: "",
-      departamento: "", // Agora bindado com o select
+      departamento: "",
       descricao: "",
-      listaDepartamentos: [], // Lista para o dropdown
+      listaDepartamentos: [],
 
-      // Controle de ordenação
       ordenacao: {
-        coluna: 'codigo', // 'codigo', 'descricao', 'departamento'
-        direcao: 'asc'    // 'asc' (crescente) ou 'desc' (decrescente)
-      }
+        coluna: "codigo",
+        direcao: "asc",
+      },
     };
   },
 
@@ -106,65 +107,41 @@ export default {
       });
     },
 
-    // Nova computed property para produtos filtrados E ordenados
     produtosOrdenadosFiltrados() {
-      // Pega os produtos já filtrados
       const filtrados = this.produtosFiltrados;
 
-      // Ordena conforme configuração atual
       return [...filtrados].sort((a, b) => {
-        let valorA, valorB;
+        let valorA = a[this.ordenacao.coluna];
+        let valorB = b[this.ordenacao.coluna];
 
-        // Obtém os valores baseado na coluna selecionada
-        switch (this.ordenacao.coluna) {
-          case 'codigo':
-            valorA = a.codigo;
-            valorB = b.codigo;
-            break;
-          case 'descricao':
-            valorA = a.descricao.toLowerCase();
-            valorB = b.descricao.toLowerCase();
-            break;
-          case 'departamento':
-            valorA = a.departamento.toLowerCase();
-            valorB = b.departamento.toLowerCase();
-            break;
-          default:
-            return 0;
-        }
+        if (typeof valorA === "string") valorA = valorA.toLowerCase();
+        if (typeof valorB === "string") valorB = valorB.toLowerCase();
 
-        // Comparação com base na direção
-        if (valorA < valorB) {
-          return this.ordenacao.direcao === 'asc' ? -1 : 1;
-        }
-        if (valorA > valorB) {
-          return this.ordenacao.direcao === 'asc' ? 1 : -1;
-        }
+        if (valorA < valorB) return this.ordenacao.direcao === "asc" ? -1 : 1;
+        if (valorA > valorB) return this.ordenacao.direcao === "asc" ? 1 : -1;
         return 0;
       });
-    }
+    },
   },
 
   methods: {
     async buscarProdutos() {
       try {
         const token = localStorage.getItem("token");
+
         const res = await api.get("/produtos/listar", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         const lista = res.data?.data ?? [];
 
-        this.produtos = lista
-          .map((p) => ({
-            codigo: Number(p.codigo),
-            descricao: p.descricao || "Sem descrição",
-            departamento: p.departamento || "Sem departamento",
-          }));
+        this.produtos = lista.map((p) => ({
+          codigo: Number(p.codigo),
+          descricao: p.descricao || "Sem descrição",
+          departamento: p.departamento || "Sem departamento",
+        }));
 
-        // Extrai departamentos únicos
         this.extrairDepartamentosUnicos();
-
       } catch (err) {
         console.error(err);
         alert("Erro ao buscar produtos");
@@ -172,22 +149,17 @@ export default {
     },
 
     extrairDepartamentosUnicos() {
-      const todosDepartamentos = this.produtos
-        .map(p => p.departamento)
-        .filter(dept => dept && dept.trim() !== "");
-
-      this.listaDepartamentos = [...new Set(todosDepartamentos)].sort();
+      const todos = this.produtos.map((p) => p.departamento);
+      this.listaDepartamentos = [...new Set(todos)].sort();
     },
 
-    // Método para ordenar ao clicar nos cabeçalhos
     ordenarPor(coluna) {
       if (this.ordenacao.coluna === coluna) {
-        // Se clicar na mesma coluna, inverte a direção
-        this.ordenacao.direcao = this.ordenacao.direcao === 'asc' ? 'desc' : 'asc';
+        this.ordenacao.direcao =
+          this.ordenacao.direcao === "asc" ? "desc" : "asc";
       } else {
-        // Se clicar em coluna diferente, define como ascendente
         this.ordenacao.coluna = coluna;
-        this.ordenacao.direcao = 'asc';
+        this.ordenacao.direcao = "asc";
       }
     },
 
@@ -204,189 +176,188 @@ export default {
 </script>
 
 <style scoped>
-/* Fundo da página */
+
+/* FUNDO DA PÁGINA */
 .page {
   padding: 40px;
   background: #f5f7fb;
   min-height: 100vh;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
-/* Cartões brancos */
+/* CARDS */
 .card {
   background: white;
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   margin-bottom: 25px;
 }
 
 h1 {
   margin-bottom: 20px;
+  color: #d90429;
 }
 
-/* Área dos filtros */
+/* FILTROS */
 .filters {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-/* Inputs */
-input {
-  padding: 10px;
-  border-radius: 8px;
+/* Inputs padrão */
+.filters input,
+.filters select {
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
   border: 1px solid #ddd;
-  width: 180px;
+  background: #fafafa;
+  transition: 0.2s;
+  font-size: 14px;
 }
 
-/* Botões base */
+.filters input:focus,
+.filters select:focus {
+  outline: none;
+  border: 1px solid #d90429;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(217,4,41,0.15);
+}
+
+/* SELECT maior */
+.select-departamento {
+  min-width: 240px;
+  width: 100%;
+  max-width: 280px;
+  cursor: pointer;
+}
+
+/* BOTÕES */
 .btn {
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 11px 22px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   font-weight: bold;
+  transition: 0.2s;
 }
 
 /* Botão buscar */
 .primary {
-  background: #4cafef;
+  background: linear-gradient(90deg,#d90429,#ff2e2e);
   color: white;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
 }
 
 .primary:hover {
-  background: #3498db;
+  transform: translateY(-2px);
 }
 
 /* Botão sair */
 .danger {
-  background: #ff5c5c;
+  background: #5e5e5e;
   color: white;
 }
 
 .danger:hover {
-  background: #e04848;
+  background: #444;
 }
 
-/* Tabela */
+/* TABELA PROFISSIONAL */
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
-/* Cabeçalho azul */
+/* Cabeçalho */
 thead {
-  background: #fa021b;
+  background: #d90429;
   color: white;
+  font-size: 15px;
 }
 
+/* Células */
 th, td {
-  padding: 12px;
-  text-align: left;
+  padding: 14px 16px;
+  vertical-align: middle;
+}
+
+/* ALINHAMENTO DAS COLUNAS */
+
+/* Código centralizado */
+th:nth-child(1),
+td:nth-child(1) {
+  width: 120px;
+  text-align: center;
+}
+
+/* Descrição centralizada */
+th:nth-child(2),
+td:nth-child(2) {
+  width: auto;
+  text-align: center;
+}
+
+/* Departamento centralizado */
+th:nth-child(3),
+td:nth-child(3) {
+  width: 180px;
+  text-align: center;
 }
 
 /* Linhas alternadas */
 tbody tr:nth-child(even) {
-  background: #f2f6fb;
+  background: #f7f9fc;
 }
 
-/* Hover da linha */
+/* Hover */
 tbody tr:hover {
-  background: #eaf2ff;
+  background: #eef3ff;
 }
 
-/* Badge azul do departamento */
+/* BADGE DEPARTAMENTO */
 .badge {
-  background: #eef4ff;
-  color: #e71b36;
-  padding: 5px 10px;
+  background: #ffe5e9;
+  color: #d90429;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
+  font-weight: 600;
 }
 
-.select-departamento {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  width: 200px; /* Ligeiramente maior que os inputs */
-  background-color: white;
-  cursor: pointer;
-}
-
-/* Estilo para os options */
-.select-departamento option {
-  padding: 8px;
-}
-
-/* Para manter o layout consistente */
-.filters input,
-.filters select {
-  height: 40px; /* mesma altura */
-  box-sizing: border-box;
-}
-
-/* Adicionando hover e focus para o select */
-.select-departamento:hover {
-  border-color: #4cafef;
-}
-
-.select-departamento:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-/* ===== ESTILOS PARA ORDENAÇÃO ===== */
-
-/* Cabeçalhos clicáveis */
+/* ORDENAÇÃO */
 .sortable-header {
   cursor: pointer;
   user-select: none;
   position: relative;
-  padding-right: 30px !important; /* Espaço para o ícone */
-  transition: background-color 0.2s;
+  padding-right: 30px !important;
 }
 
 .sortable-header:hover {
-  background-color: rgba(250, 2, 27, 0.9) !important;
+  background-color: rgba(255,255,255,0.15);
 }
 
-/* Ícones de ordenação */
-.sort-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-weight: bold;
-  color: white;
-  font-size: 14px;
-}
-
+.sort-icon,
 .sort-icon-placeholder {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0.5;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
 }
 
-/* Para mobile */
+.sort-icon-placeholder {
+  opacity: 0.5;
+}
+
+/* RESPONSIVO */
 @media (max-width: 768px) {
-  .sort-icon,
-  .sort-icon-placeholder {
-    font-size: 10px;
-    right: 5px;
-  }
-
-  .sortable-header {
-    padding-right: 25px !important;
-  }
-
   .filters {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .filters input,
@@ -394,4 +365,18 @@ tbody tr:hover {
     width: 100%;
   }
 }
+
+/* HEADER SUPERIOR */
+.header {
+  display: flex;
+  justify-content: space-between; /* joga cada item para um lado */
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.titulo {
+  margin: 0;
+  color: #d90429;
+}
+
 </style>

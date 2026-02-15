@@ -115,17 +115,15 @@ export default {
 /* Logo */
 .logo {
   font-family: 'Montserrat', sans-serif;
-  font-size: 48px;
-  font-weight: 900;
-  letter-spacing: 6px;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 2px;
   margin-bottom: 5px;
 
-  /* efeito degradê */
-  background: linear-gradient(90deg,#b30000,#ff2e2e,#ff6b6b);
+  background: linear-gradient(90deg,#ff2e2e,#d90429);
   -webkit-background-clip: text;
+  background-clip: text;          /* 👈 adiciona esta linha */
   -webkit-text-fill-color: transparent;
-
-  text-shadow: 0 2px 10px rgba(0,0,0,0.15);
 }
 
 p {
