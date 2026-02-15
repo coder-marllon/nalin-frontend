@@ -4,7 +4,7 @@
 
     <!-- Card central branco -->
     <div class="login-card">
-      <h1>Nalin</h1>
+      <h1 class="logo">NALIN</h1>
       <p>Login do Sistema</p>
 
       <!-- v-model liga o input com a variável "login" do data() -->
@@ -71,71 +71,121 @@ export default {
 };
 </script>
 
+
 <style scoped>
-/* Fundo azul degradê ocupando a tela toda */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap');
+
+
+/* 🔴 Fundo moderno */
 .login-page {
   height: 100vh;
-  background: linear-gradient(135deg, #c21f2d, #7a0404);
+  background: linear-gradient(120deg, #7a0404, #c21f2d, #ff3b3b);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* Cartão branco do login */
+/* 🧊 Card com efeito vidro */
 .login-card {
-  background: white;
-  padding: 40px;
-  border-radius: 15px;
-  width: 320px;
+  backdrop-filter: blur(12px);
+  background:white;
+  padding: 45px;
+  border-radius: 18px;
+  width: 340px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  animation: fadeUp 0.6s ease;
+  border: 1px solid #eee;
+  animation: subirFade 0.8s ease-out;
 }
 
-/* Título Nalin */
-h1 {
+/* ✨ Animação de entrada */
+@keyframes subirFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Logo */
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 6px;
   margin-bottom: 5px;
-  /* color: #3b6edc; */
-  color: rgb(224, 2, 2);
+
+  /* efeito degradê */
+  background: linear-gradient(90deg,#b30000,#ff2e2e,#ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  text-shadow: 0 2px 10px rgba(0,0,0,0.15);
 }
 
-/* Subtítulo */
 p {
-  margin-bottom: 25px;
-  color: #888;
-}
-
-/* Inputs */
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-/* Botão entrar */
-button {
-  width: 100%;
-  padding: 12px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Efeito hover do botão */
-button:hover {
-  background: #8B0000;
-}
-
-/* Mensagem de erro */
-.erro {
-  display: block;
-  margin-top: 15px;
-  color: red;
+  margin-bottom: 30px;
+  color: #777;
   font-size: 14px;
 }
+
+/* Inputs modernos */
+input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border: 1px solid #d90429;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(217,4,41,0.15);
+}
+
+/* 🔥 Botão premium */
+button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg,#d90429,#ff2e2e);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* ❌ erro estilizado */
+.erro {
+  display: block;
+  margin-top: 18px;
+  background: #ffe5e5;
+  color: #c21f2d;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
 </style>
