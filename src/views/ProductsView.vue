@@ -369,7 +369,7 @@ tbody tr:hover {
 /* HEADER SUPERIOR */
 .header {
   display: flex;
-  justify-content: space-between; /* joga cada item para um lado */
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
 }
